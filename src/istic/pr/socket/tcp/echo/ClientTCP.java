@@ -75,6 +75,6 @@ public class ClientTCP {
 	public static void envoyerMessage(PrintWriter printer, String message) throws IOException {
 		printer.println(message);
 		printer.flush();
-		// Envoyer le message vers le client 
+		// Envoyer le message vers le client
 	}
 }
