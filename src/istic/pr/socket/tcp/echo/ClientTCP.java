@@ -17,19 +17,23 @@ public class ClientTCP {
 
 	public static void main(String[] args) throws IOException, IOException {
 		// créer une socket client
-		System.out.println(" IP du serveur ?");
-		String ip = lireMessageAuClavier();
-		// verif format TODO
 
-		int port;// pour si on fait le mode "en une saisie"
-		System.out.println("Port ? ");
-		// verif format. possibilité de mettre 0.0.0.0:0 pour l'adresse complete, TODO
-		Scanner sc = new Scanner(System.in);
-		port = sc.nextInt();
+		String ip = "";
+		while (!checkip(ip)) {
+			System.out.println(" IP du serveur ?");
+			ip = lireMessageAuClavier();
+			// verif format TODO
+		}
+		int port = 9999;// pour si on fait le mode "en une saisie"
 
+		/*
+		 * System.out.println("Port ? "); // verif format. possibilité de mettre
+		 * 0.0.0.0:0 pour l'adresse complete, TODO Scanner sc = new Scanner(System.in);
+		 * port = sc.nextInt();
+		 */
 		Socket socket = new Socket(InetAddress.getByName(ip), port);
 		// créer reader et writer associés
-		sc.close();
+		// sc.close();
 		BufferedReader in = creerReader(socket);
 		PrintWriter out = creerPrinter(socket);
 
@@ -47,13 +51,45 @@ public class ClientTCP {
 		// envoyer le message au serveur
 
 		// recevoir et afficher la réponse du serveur
+	
+	end(socket, in, out);
+	}
+
+/**
+ * Vérifie le format de l'ip
+ * @param ip string de l'ip en ipv4 ex:"127.0.0.1"
+ * @return l'ip est valide
+ */
+	private static boolean checkip(String ip) {
+		 try {
+		        if ( ip == null || ip.isEmpty() ) {
+		            return false;
+		        }
+		        String[] parts = ip.split( "\\." );
+		        if ( parts.length != 4 ) {
+		            return false;
+		        }
+		        for ( String s : parts ) {
+		            int i = Integer.parseInt( s );
+		            if ( (i < 0) || (i > 255) ) {
+		                return false;
+		            }
+		        }
+		        if ( ip.endsWith(".") ) {
+		            return false;
+		        }
+		        return true;
+		    } catch (NumberFormatException nfe) {
+		        return false;
+		    }
+		 
 	}
 
 	public static String lireMessageAuClavier() throws IOException {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("> ");
 		String str = sc.nextLine();
-		sc.close();
+		// sc.close();
 		return str;
 	}
 
@@ -76,5 +112,18 @@ public class ClientTCP {
 		printer.println(message);
 		printer.flush();
 		// Envoyer le message vers le client
+	}
+	public static void end (Socket socket, BufferedReader in, PrintWriter out) {
+		
+		try {
+			if (in != null)
+				in.close();
+			if (out != null)
+				out.close();
+			if (socket != null)
+				socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
