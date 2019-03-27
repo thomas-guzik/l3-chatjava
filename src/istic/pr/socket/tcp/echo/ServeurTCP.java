@@ -17,6 +17,8 @@ public class ServeurTCP {
     	int portEcoute = 9999;
     	ServerSocket socketServeur = new ServerSocket(portEcoute);
     	
+    	System.out.println("Server open with ip: " + socketServeur.getInetAddress() + " port: " + socketServeur.getLocalPort());
+    	
     	//Dans une boucle, pour chaque socket clientes, appeler traiterSocketCliente
     	while (true) {
     		Socket socketVersUnClient = socketServeur.accept();
@@ -31,12 +33,14 @@ public class ServeurTCP {
     	
     	String msg;
         //Tant qu’il y’a un message à lire via recevoirMessage
-    	while((msg = recevoirMessage(socketVersUnClient)) != null) {
+    	while((msg = recevoirMessage(reader)) != null) {
+    		System.out.println("Msg received: " + msg);
     		//Envoyer message au client via envoyerMessage
     		envoyerMessage(printer, msg);
     	}
 
         //Si plus de ligne à lire fermer socket cliente
+    	socketVersUnClient.close();
     }
 
     public static BufferedReader creerReader(Socket socketVersUnClient)
@@ -51,10 +55,10 @@ public class ServeurTCP {
     	return new PrintWriter(new OutputStreamWriter(socketVersUnClient.getOutputStream()));
     }
 
-    public static String recevoirMessage(Socket socketVersUnClient) throws
+    public static String recevoirMessage(BufferedReader reader) throws
     IOException {
         //Récupérer une ligne
-    	return socketVersUnClient.readLine();
+    	return reader.readLine();
         //Retourner la ligne lue ou null si aucune ligne à lire.
     }
 
