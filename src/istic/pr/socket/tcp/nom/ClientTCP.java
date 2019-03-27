@@ -43,7 +43,10 @@ public class ClientTCP {
 		// recevoir et afficher la réponse du serveur
 
 		String msg = "";
+		String nom = args[0];
+		envoyerMessage(out,nom);
 		while (!msg.equalsIgnoreCase("fin")) {
+			System.out.println(nom +"> ");
 			msg = lireMessageAuClavier();
 			envoyerMessage(out, msg);
 			System.out.println(recevoirMessage(in));
@@ -55,6 +58,17 @@ public class ClientTCP {
 	end(socket, in, out);
 	}
 
+	/**
+	 * envoie le nom du client
+	 * @param printer
+	 * @param nom
+	 * @throws IOException
+	 */
+	public static void envoyerNom(PrintWriter printer, String nom) throws
+	IOException {		
+	envoyerMessage(printer, nom);
+	    //envoi « NAME: nom » au serveur
+	}
 /**
  * Vérifie le format de l'ip
  * @param ip string de l'ip en ipv4 ex:"127.0.0.1"
@@ -87,7 +101,6 @@ public class ClientTCP {
 
 	public static String lireMessageAuClavier() throws IOException {
 		Scanner sc = new Scanner(System.in);
-		System.out.println("> ");
 		String str = sc.nextLine();
 		// sc.close();
 		return str;

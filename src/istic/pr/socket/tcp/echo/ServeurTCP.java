@@ -16,7 +16,6 @@ public class ServeurTCP {
         //Attente des connexions sur le port 9999
     	int portEcoute = 9999;
     	ServerSocket socketServeur = new ServerSocket(portEcoute);
-    	
     	System.out.println("Server open with ip: " + socketServeur.getInetAddress() + " port: " + socketServeur.getLocalPort());
     	
     	//Dans une boucle, pour chaque socket clientes, appeler traiterSocketCliente
