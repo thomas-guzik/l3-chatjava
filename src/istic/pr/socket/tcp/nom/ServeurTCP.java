@@ -29,9 +29,10 @@ public class ServeurTCP {
 		PrintWriter printer = creerPrinter(socketVersUnClient);
 		BufferedReader reader = creerReader(socketVersUnClient);
 		String nom = avoirNom(reader);
+		System.out.println("New user: "+nom);
 		String msg;
 		// Tant qu’il y’a un message à lire via recevoirMessage
-		while ((msg = recevoirMessage(reader)).equalsIgnoreCase("fin")) {
+		while ( !(msg = recevoirMessage(reader)).equalsIgnoreCase("fin")) {
 			System.out.println("Msg received: " + msg);
 			// Envoyer message au client via envoyerMessage
 			envoyerMessage(printer, msg);

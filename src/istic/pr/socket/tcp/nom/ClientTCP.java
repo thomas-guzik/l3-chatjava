@@ -43,7 +43,10 @@ public class ClientTCP {
 		// recevoir et afficher la réponse du serveur
 
 		String msg = "";
-		String nom = args[0];
+		
+		String nom = "anon";
+		if(args.length>0)
+			nom=args[0];
 		envoyerMessage(out,nom);
 		while (!msg.equalsIgnoreCase("fin")) {
 			System.out.println(nom +"> ");
