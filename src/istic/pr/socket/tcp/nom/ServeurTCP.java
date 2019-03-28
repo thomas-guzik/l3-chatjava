@@ -28,11 +28,21 @@ public class ServeurTCP {
 		// CrÃ©er printer et reader
 		PrintWriter printer = creerPrinter(socketVersUnClient);
 		BufferedReader reader = creerReader(socketVersUnClient);
+		
+		//Gérer nom client
 		String nom = avoirNom(reader);
-		System.out.println("New user: "+nom);
+		if (!nom.startsWith("NAME:")) {// si n'a pas le préfixe prévu
+			envoyerMessage(printer, "nom non reçu");//TODO amélioration: redemander un nom au client
+			nom = "Anon";
+		} else {
+			nom = nom.substring(5);
+		} // on retire le préfixe
+		System.out.println("New user: " + nom);
+		
+		
 		String msg;
 		// Tant quâ€™il yâ€™a un message Ã  lire via recevoirMessage
-		while ( !(msg = recevoirMessage(reader)).equalsIgnoreCase("fin")) {
+		while (!(msg = recevoirMessage(reader)).equalsIgnoreCase("fin")) {
 			System.out.println("Msg received: " + msg);
 			// Envoyer message au client via envoyerMessage
 			envoyerMessage(printer, msg);

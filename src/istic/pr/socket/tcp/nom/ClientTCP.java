@@ -44,9 +44,9 @@ public class ClientTCP {
 
 		String msg = "";
 		
-		String nom = "anon";
+		String nom = "NAME:";
 		if(args.length>0)
-			nom=args[0];
+			nom+=args[0];
 		envoyerMessage(out,nom);
 		while (!msg.equalsIgnoreCase("fin")) {
 			System.out.println(nom +"> ");
