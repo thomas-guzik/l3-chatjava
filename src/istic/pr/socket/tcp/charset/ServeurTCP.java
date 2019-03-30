@@ -49,30 +49,37 @@ public class ServeurTCP {
 	}
 
 	private static void traiterSocketCliente(Socket socketVersUnClient, Charset cs) throws IOException {
-		// Créer printer et reader
-		PrintWriter printer = creerPrinter(cs, socketVersUnClient);
-		BufferedReader reader = creerReader(cs, socketVersUnClient);
-
-		// G�rer nom client
-		String nom = avoirNom(reader);
-		if (!nom.startsWith("NAME:")) {// si n'a pas le pr�fixe pr�vu
-			envoyerMessage(printer, "nom non re�u");// TODO am�lioration: redemander un nom au client
-			nom = "Anon";
-		} else {
-			nom = nom.substring(5);
-		} // on retire le pr�fixe
-		System.out.println("New user: " + nom);
-
-		String msg;
-		// Tant qu’il y’a un message à lire via recevoirMessage
-		while (!(msg = recevoirMessage(reader)).equalsIgnoreCase("fin")) {
-			System.out.println("Msg received: " + msg);
-			// Envoyer message au client via envoyerMessage
-			envoyerMessage(printer, msg);
-		}
-
-		// Si plus de ligne à lire fermer socket cliente
-		socketVersUnClient.close();
+		//Cree printer et reader
+    	PrintWriter printer = creerPrinter(cs, socketVersUnClient);
+    	BufferedReader reader = creerReader(cs, socketVersUnClient);
+	    
+    	try {
+	    	String msg;
+	    	String name = avoirNom(reader);
+	    	if(name == null) {
+	    		envoyerMessage(printer, "Erreur envoi du nom invalide");
+	    	}
+	    	else {
+		        //Tant qu’il y’a un message à lire via recevoirMessage
+		    	while((msg = recevoirMessage(reader)) != null) {
+		    		System.out.println("Msg received: " + msg);
+		    		//Envoyer message au client via envoyerMessage
+		    		envoyerMessage(printer, name + ">" + msg);
+		    	}
+	    	}
+    	}
+    	catch(IOException e) {
+    		e.printStackTrace();
+    	}
+    	finally {
+    		socketVersUnClient.close();
+    		printer.close();
+    		reader.close();
+    	}
+        //Si plus de ligne a lire fermer socket cliente
+    	socketVersUnClient.close();
+    	printer.close();
+		reader.close();
 	}
 	//------Obsol�te, version sans Charset
 
