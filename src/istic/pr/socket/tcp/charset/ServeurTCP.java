@@ -11,10 +11,10 @@ import java.io.PrintWriter;
 
 public class ServeurTCP {
 
-	public static void main(String[] args) throws IOException {
-
+	public static void main(String[] args) {
 		// Attente des connexions sur le port 9999
 		int portEcoute = 9999;
+		
 		Charset cs = Charset.forName("UTF-8"); // mis en global.
 		if (args.length > 0) {
 			try {
@@ -23,14 +23,29 @@ public class ServeurTCP {
 				cs = Charset.forName("UTF-8");
 			}
 		}
-		ServerSocket socketServeur = new ServerSocket(portEcoute);
-		System.out.println(
-				"Server open with ip: " + socketServeur.getInetAddress() + " port: " + socketServeur.getLocalPort());
-		// Dans une boucle, pour chaque socket clientes, appeler traiterSocketCliente
-		while (true) {
-			Socket socketVersUnClient = socketServeur.accept();
-			traiterSocketCliente(socketVersUnClient, cs);
+		
+		try {
+			ServerSocket socketServeur = new ServerSocket(portEcoute);
+			try {
+				System.out.println(
+						"Server open with ip: " + socketServeur.getInetAddress() + " port: " + socketServeur.getLocalPort());
+				// Dans une boucle, pour chaque socket clientes, appeler traiterSocketCliente
+				while (true) {
+					Socket socketVersUnClient = socketServeur.accept();
+					traiterSocketCliente(socketVersUnClient, cs);
+				}
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+			}
+			finally {
+	    		socketServeur.close();
+	    	}
 		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	private static void traiterSocketCliente(Socket socketVersUnClient, Charset cs) throws IOException {
@@ -38,14 +53,14 @@ public class ServeurTCP {
 		PrintWriter printer = creerPrinter(cs, socketVersUnClient);
 		BufferedReader reader = creerReader(cs, socketVersUnClient);
 
-		// Gérer nom client
+		// Gï¿½rer nom client
 		String nom = avoirNom(reader);
-		if (!nom.startsWith("NAME:")) {// si n'a pas le préfixe prévu
-			envoyerMessage(printer, "nom non reçu");// TODO amélioration: redemander un nom au client
+		if (!nom.startsWith("NAME:")) {// si n'a pas le prï¿½fixe prï¿½vu
+			envoyerMessage(printer, "nom non reï¿½u");// TODO amï¿½lioration: redemander un nom au client
 			nom = "Anon";
 		} else {
 			nom = nom.substring(5);
-		} // on retire le préfixe
+		} // on retire le prï¿½fixe
 		System.out.println("New user: " + nom);
 
 		String msg;
@@ -59,7 +74,7 @@ public class ServeurTCP {
 		// Si plus de ligne Ã  lire fermer socket cliente
 		socketVersUnClient.close();
 	}
-	//------Obsolète, version sans Charset
+	//------Obsolï¿½te, version sans Charset
 
 /*
 	public static void traiterSocketCliente(Socket socketVersUnClient) throws IOException {
@@ -67,14 +82,14 @@ public class ServeurTCP {
 		PrintWriter printer = creerPrinter(socketVersUnClient);
 		BufferedReader reader = creerReader(socketVersUnClient);
 
-		// Gérer nom client
+		// Gï¿½rer nom client
 		String nom = avoirNom(reader);
-		if (!nom.startsWith("NAME:")) {// si n'a pas le préfixe prévu
-			envoyerMessage(printer, "nom non reçu");// TODO amélioration: redemander un nom au client
+		if (!nom.startsWith("NAME:")) {// si n'a pas le prï¿½fixe prï¿½vu
+			envoyerMessage(printer, "nom non reï¿½u");// TODO amï¿½lioration: redemander un nom au client
 			nom = "Anon";
 		} else {
 			nom = nom.substring(5);
-		} // on retire le préfixe
+		} // on retire le prï¿½fixe
 		System.out.println("New user: " + nom);
 
 		String msg;
