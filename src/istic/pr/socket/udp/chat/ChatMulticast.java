@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
@@ -19,7 +18,6 @@ public class ChatMulticast {
 		t1.start();
 		try {
 			MulticastSocket s = new MulticastSocket(9999);
-			InetAddress group = InetAddress.getByName("225.0.4.7");
 			
 			System.out.println("Name ?");
 			String name = lireMessageAuClavier();
@@ -68,13 +66,12 @@ public class ChatMulticast {
 		while(recvOn && packet.getAddress() == null ) {
 			try {
 				s.receive(packet);
-			}
-			catch(SocketTimeoutException e) {}
+			} catch(SocketTimeoutException e) {/* On fait rien */}
 		}
 		return new String(packet.getData());
 	}
 	
-	public static String lireMessageAuClavier() throws IOException, SocketException {
+	public static String lireMessageAuClavier() throws IOException {
 		return new BufferedReader(new InputStreamReader(System.in)).readLine();
 	}
 	
@@ -94,8 +91,7 @@ public class ChatMulticast {
 						recvMsg = recevoirMessage(recvSocket);
 						System.out.println(recvMsg);
 					}
-				}
-				finally {
+				} finally {
 					quit();
 				}
 			} catch (IOException e) {

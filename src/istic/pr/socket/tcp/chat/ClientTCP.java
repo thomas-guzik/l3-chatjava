@@ -165,7 +165,7 @@ public class ClientTCP {
 				System.out.println(msg);
 			}
 		} catch (IOException e) {
-			System.exit(0);// TODO Dégeulasse? je compte le corriger. !au cazou
+			System.exit(0);// TODO DÃ©geulasse? je compte le corriger. !au cazou
 		}
 	}
 }

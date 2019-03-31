@@ -16,23 +16,23 @@ public class ServeurTCP {
 	public static void main(String[] args) {
 		// Attente des connexions sur le port 9999
 		int portEcoute = 9999;
-		int nbThreads=5; //default threadpool 
-		Charset cs = Charset.forName("UTF-8"); // mis en global.
-		if (args.length > 0) {
-			try {
-				cs = Charset.forName(args[0]);
-			} catch (Exception e) {
-				cs = Charset.forName("UTF-8");
+		Charset cs;
+		try {
+			cs = Charset.forName(args[0]);
+		} catch(ArrayIndexOutOfBoundsException e) {
+			System.out.println("Error charset not defined in parameters\nCharset set as: UTF-8");
+			cs = Charset.forName("UTF-8");
+		}
+		
+		int nbThreads;
+		try { 
+			nbThreads = Integer.parseInt(args[1]);
+			if(nbThreads < 1 || nbThreads > 64) {
+				throw new Exception();
 			}
-			try { 
-				nbThreads=Integer.parseInt(args[1]);
-				if(nbThreads <1 || nbThreads >64)
-					nbThreads = 5;System.out.println("invalid pool of threads");
-			}catch(Exception e) {
-				System.out.println("invalid pool of threads");
-				nbThreads=5;
-				
-			}
+		} catch(Exception e) { // NumberFormatException, ArrayIndexOutOfBoundsException, Exception
+			System.out.println("Invalid pool of threads, set the number as 5");
+			nbThreads = 5;
 		}
 
 		try {
@@ -51,15 +51,12 @@ public class ServeurTCP {
 					Socket socketVersUnClient = socketServeur.accept();
 					service.execute(new TraiteUnClient(socketVersUnClient, cs));
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			} finally {
 				socketServeur.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	protected static void traiterSocketCliente(Socket socketVersUnClient, Charset cs) throws IOException {
@@ -94,37 +91,43 @@ public class ServeurTCP {
 		printer.close();
 		reader.close();
 	}
+	
 	public static String avoirNom(BufferedReader reader) throws IOException {
-		// retourne le nom du client (en utilisant split de la classe String par
-		// exemple)
-		String[] parts = reader.readLine().split(":");
-		if (parts.length == 2) {
-			if (parts[0].equals("NAME")) {
-				return parts[1];
-			} else {
-				System.out.println("Errparts");
+		// Retourne le nom du client (en utilisant split de la classe String par exemple)
+		try {
+			String[] parts = reader.readLine().split(":");
+			if(parts.length == 2) {
+				if(parts[0].equals("NAME")) {
+					return parts[1];
+				}
+				else {
+					System.out.println("Error cmd NAME not found");
+					return null;
+				}
+			}
+			else {
+				System.out.println("Error not cmd found");
 				return null;
 			}
-		} else {
-			System.out.println("errSplit");
+		} catch(NullPointerException e) {
 			return null;
 		}
 	}
 
 	public static BufferedReader creerReader(Charset charset, Socket socketVersUnClient) throws IOException {
-		// créé un BufferedReader associé à la Socket
+		// Cree un BufferedReader associe a la Socket
 		return new BufferedReader(new InputStreamReader(socketVersUnClient.getInputStream(), charset));
 	}
 
 	public static PrintWriter creerPrinter(Charset charset, Socket socketVersUnClient) throws IOException {
-		// créé un PrintWriter associé à la Socket
+		// Cree un PrintWriter associe a la Socket
 		return new PrintWriter(new OutputStreamWriter(socketVersUnClient.getOutputStream(), charset));
 	}
-
+	
 	public static String recevoirMessage(BufferedReader reader) throws IOException {
-		// Récupérer une ligne
+		// Recupérer une ligne
 		return reader.readLine();
-		// Retourner la ligne lue ou null si aucune ligne à lire.
+		// Retourner la ligne lue ou null si aucune ligne a lire.
 	}
 
 	public static void envoyerMessage(PrintWriter printer, String message) throws IOException {
@@ -132,5 +135,4 @@ public class ServeurTCP {
 		printer.flush();
 		// Envoyer le message vers le client
 	}
-
 }
