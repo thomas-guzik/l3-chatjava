@@ -9,18 +9,18 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class ClientTCP {
-
+	private static int port = 9999;
+	private static String ip = "";
+	private static Charset charset;
+	private static Socket socket = null;
+	private static BufferedReader in = null;
+	
 	public static void main(String[] args) {
-		int port = 9999;
-		String ip = "";
-		String outMsg = "$fin";
 		
+		String outMsg = "$fin";
 		String name;
-		Charset charset;
 		
 		try {
 			name = args[0];
@@ -47,11 +47,11 @@ public class ClientTCP {
 			}
 
 			// Creer une socket client
-			Socket socket = new Socket(InetAddress.getByName(ip), port);
+			socket = new Socket(InetAddress.getByName(ip), port);
 
 			try {
 				// Creer reader et writer associes
-				BufferedReader in = creerReader(charset, socket);
+				in = creerReader(charset, socket);
 				PrintWriter out = creerPrinter(charset, socket);
 				String msg = "";
 				envoyerNom(out, name);
@@ -61,17 +61,23 @@ public class ClientTCP {
 				// Envoyer le message au serveur
 				// Recevoir et afficher la reponse du serveur
 
-				Executor service = Executors.newFixedThreadPool(1);
+				// Executor service = Executors.newFixedThreadPool(1);
+				ReceiveRunnable recvRun = new ReceiveRunnable();
+				Thread t1 = new Thread(recvRun);
+				t1.start();
 				while (!msg.equalsIgnoreCase(outMsg)) {
-					service.execute(new RecevoirMessages(in));
+					//service.execute(new RecevoirMessages(in));
 					msg = lireMessageAuClavier();
-
 					envoyerMessage(out, msg);
 				}
+				recvRun.quit();
+				t1.join();
 				end(socket, in, out);
 			} finally {
 				socket.close();
 			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -162,7 +168,25 @@ public class ClientTCP {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			//System.exit(0);// TODO Dégeulasse? je compte le corriger. !au cazou
+		}
+	}
+	
+	private static class ReceiveRunnable implements Runnable {
+		private boolean recvOn;
+		
+		public void run() {
+			try {
+				recvOn = true;
+				while(recvOn) {
+					System.out.println(recevoirMessage(in));
+				}
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void quit() {
+			recvOn = false;
 		}
 	}
 }
