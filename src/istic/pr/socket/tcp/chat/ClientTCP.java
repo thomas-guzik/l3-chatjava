@@ -7,9 +7,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -19,6 +18,27 @@ public class ClientTCP {
 		int port = 9999;
 		String ip = "";
 		String outMsg = "$fin";
+		
+		String name;
+		Charset charset;
+		
+		try {
+			name = args[0];
+		} catch(ArrayIndexOutOfBoundsException e) {
+			System.out.println("Error name is not in parameters\nName set as: Default_name");
+			name = "Default_name";
+		}
+		
+		try {
+			charset = Charset.forName(args[1]);
+		} catch(ArrayIndexOutOfBoundsException e) {
+			System.out.println("Error charset not defined in parameters\nCharset set as: UTF-8");
+		} catch(UnsupportedCharsetException e) {
+			System.out.println("Unsupported charset\nCharset set as: UTF-8");
+		} finally {
+			charset = Charset.forName("UTF-8");
+		}
+		
 		try {
 			while (!checkip(ip)) {
 				System.out.println(" IP du serveur ?");
@@ -26,35 +46,20 @@ public class ClientTCP {
 				// verif format
 			}
 
-			// creer une socket client
+			// Creer une socket client
 			Socket socket = new Socket(InetAddress.getByName(ip), port);
 
 			try {
-
-				// Attention tu programmes du code de la fonction envoyerNom dans le main
-
-				String nom = "";
-				Charset charset = Charset.forName("UTF-8");
-				if (args.length > 0)
-					nom += args[0];
-				if (args.length > 1) {
-					try {
-						charset = Charset.forName(args[1]);
-					} catch (Exception e) {
-						charset = Charset.forName("UTF-8");// default
-					}
-				}
-
-				// creer reader et writer associes
+				// Creer reader et writer associes
 				BufferedReader in = creerReader(charset, socket);
 				PrintWriter out = creerPrinter(charset, socket);
 				String msg = "";
-				envoyerNom(out, nom); // Ici on doit utiliser la fc envoyerNom
+				envoyerNom(out, name);
 
 				// Tant que le mot "fin" n'est pas lu sur le clavier,
 				// Lire un message au clavier
-				// envoyer le message au serveur
-				// recevoir et afficher la reponse du serveur
+				// Envoyer le message au serveur
+				// Recevoir et afficher la reponse du serveur
 
 				Executor service = Executors.newFixedThreadPool(1);
 				while (!msg.equalsIgnoreCase(outMsg)) {
@@ -64,11 +69,6 @@ public class ClientTCP {
 					envoyerMessage(out, msg);
 				}
 				end(socket, in, out);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				System.out.println("Erreur, aucun nom en argument lors de l'appel du main");
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
 			} finally {
 				socket.close();
 			}
@@ -79,15 +79,15 @@ public class ClientTCP {
 	}
 
 	/**
-	 * envoie le nom du client
+	 * Envoie le nom du client
 	 * 
 	 * @param printer
 	 * @param nom
 	 * @throws IOException
 	 */
 	public static void envoyerNom(PrintWriter printer, String nom) throws IOException {
-		// envoi "NAME:nom" au serveur
-		envoyerMessage(printer, "NAME:" + nom);
+		//envoi "NAME:nom" au serveur
+		envoyerMessage(printer, "NAME:"+nom);
 	}
 
 	/**
@@ -125,17 +125,17 @@ public class ClientTCP {
 	}
 
 	public static BufferedReader creerReader(Charset cs, Socket socketVersUnClient) throws IOException {
-		// cree un BufferedReader associe a la Socket
+		// Cree un BufferedReader associe a la Socket
 		return new BufferedReader(new InputStreamReader(socketVersUnClient.getInputStream(), cs));
 	}
 
 	public static PrintWriter creerPrinter(Charset cs, Socket socketVersUnClient) throws IOException {
-		// cree un PrintWriter associe a la Socket
+		// Cree un PrintWriter associe a la Socket
 		return new PrintWriter(new OutputStreamWriter(socketVersUnClient.getOutputStream(), cs));
 	}
 
 	public static String recevoirMessage(BufferedReader reader) throws IOException {
-		// identique serveur
+		// Identique serveur
 		return reader.readLine();
 	}
 
@@ -145,17 +145,13 @@ public class ClientTCP {
 		printer.flush();
 	}
 
-	public static void end(Socket socket, BufferedReader in, PrintWriter out) {
-		try {
-			if (in != null)
-				in.close();
-			if (out != null)
-				out.close();
-			if (socket != null)
-				socket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public static void end(Socket socket, BufferedReader in, PrintWriter out) throws IOException {
+		if (in != null)
+			in.close();
+		if (out != null)
+			out.close();
+		if (socket != null)
+			socket.close();
 	}
 
 	public static synchronized void recevoirTout(BufferedReader in) {
@@ -165,7 +161,8 @@ public class ClientTCP {
 				System.out.println(msg);
 			}
 		} catch (IOException e) {
-			System.exit(0);// TODO Dégeulasse? je compte le corriger. !au cazou
+			e.printStackTrace();
+			//System.exit(0);// TODO Dégeulasse? je compte le corriger. !au cazou
 		}
 	}
 }

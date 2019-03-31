@@ -1,6 +1,5 @@
 package istic.pr.socket.tcp.chat;
 
-import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.Charset;
 
@@ -13,14 +12,11 @@ public class TraiteUnClient implements Runnable {
 	}
 
 	public void run() {
-	try{
-		ServeurTCP.traiterSocketCliente(socket, cs);
-	}catch(Exception e) {
-		System.out.println("Thread: run bug");
-		e.printStackTrace();
+		try{
+			ServeurTCP.traiterSocketCliente(socket, cs);
+		}catch(Exception e) {
+			System.out.println("Thread: run bug");
+			e.printStackTrace();
+		}
 	}
-	
-}
-
-	
 }
