@@ -46,14 +46,17 @@ public class ServeurTCP {
         		return parts[1];
         	}
         	else {
+        		System.out.println("Errparts");
         		return null;
         	}
     	}
     	else {
+    		System.out.println("errSplit");
     		return null;
     	}
     }
     
+    	
     public static void traiterSocketCliente(Socket socketVersUnClient) throws IOException {
         
     	//Cree printer et reader
@@ -71,7 +74,7 @@ public class ServeurTCP {
 		    	while((msg = recevoirMessage(reader)) != null) {
 		    		System.out.println("Msg received: " + msg);
 		    		//Envoyer message au client via envoyerMessage
-		    		envoyerMessage(printer, name + ">" + msg);
+		    		envoyerMessage(printer, name + "> " + msg);
 		    	}
 	    	}
     	}
@@ -84,6 +87,7 @@ public class ServeurTCP {
     		reader.close();
     	}
         //Si plus de ligne a lire fermer socket cliente
+    	System.out.println("client closed");
     	socketVersUnClient.close();
     	printer.close();
 		reader.close();

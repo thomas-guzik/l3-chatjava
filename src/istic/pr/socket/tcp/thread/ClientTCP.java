@@ -1,4 +1,4 @@
-package istic.pr.socket.tcp.charset;
+package istic.pr.socket.tcp.thread;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class ClientTCP {
 				PrintWriter out = creerPrinter(charset, socket);
 				String msg = "";
 				envoyerNom(out, nom); // Ici on doit utiliser la fc envoyerNom
-				
+				 
 				// Tant que le mot "fin" n'est pas lu sur le clavier,
 				// Lire un message au clavier
 				// envoyer le message au serveur

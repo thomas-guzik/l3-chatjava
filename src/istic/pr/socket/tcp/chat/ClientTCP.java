@@ -1,4 +1,4 @@
-package istic.pr.socket.tcp.charset;
+package istic.pr.socket.tcp.chat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,72 +10,72 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class ClientTCP {
 
 	public static void main(String[] args) {
 		int port = 9999;
 		String ip = "";
+		String outMsg = "$fin";
 		try {
 			while (!checkip(ip)) {
 				System.out.println(" IP du serveur ?");
 				ip = lireMessageAuClavier();
 				// verif format
 			}
-			
+
 			// creer une socket client
 			Socket socket = new Socket(InetAddress.getByName(ip), port);
-			
+
 			try {
 
-		
 				// Attention tu programmes du code de la fonction envoyerNom dans le main
-				
+
 				String nom = "";
-				Charset charset=Charset.forName("UTF-8");
+				Charset charset = Charset.forName("UTF-8");
 				if (args.length > 0)
 					nom += args[0];
 				if (args.length > 1) {
 					try {
-					charset = Charset.forName(args[1]);}
-					catch(Exception e) {
-						charset = Charset.forName("UTF-16");// default	
+						charset = Charset.forName(args[1]);
+					} catch (Exception e) {
+						charset = Charset.forName("UTF-8");// default
 					}
 				}
-				
+
 				// creer reader et writer associes
 				BufferedReader in = creerReader(charset, socket);
 				PrintWriter out = creerPrinter(charset, socket);
 				String msg = "";
 				envoyerNom(out, nom); // Ici on doit utiliser la fc envoyerNom
-				
+
 				// Tant que le mot "fin" n'est pas lu sur le clavier,
 				// Lire un message au clavier
 				// envoyer le message au serveur
 				// recevoir et afficher la reponse du serveur
-				while (!msg.equalsIgnoreCase("fin")) {
+
+				Executor service = Executors.newFixedThreadPool(1);
+				while (!msg.equalsIgnoreCase(outMsg)) {
+					service.execute(new RecevoirMessages(in));
 					msg = lireMessageAuClavier();
+
 					envoyerMessage(out, msg);
-					System.out.println(recevoirMessage(in));
 				}
-				
 				end(socket, in, out);
-			}
-			catch(ArrayIndexOutOfBoundsException e) {
+			} catch (ArrayIndexOutOfBoundsException e) {
 				System.out.println("Erreur, aucun nom en argument lors de l'appel du main");
 				e.printStackTrace();
-			}
-			catch(IOException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
-			}
-			finally {
+			} finally {
 				socket.close();
 			}
-		}
-		catch(IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/**
@@ -86,8 +86,8 @@ public class ClientTCP {
 	 * @throws IOException
 	 */
 	public static void envoyerNom(PrintWriter printer, String nom) throws IOException {
-		//envoi "NAME:nom" au serveur
-		envoyerMessage(printer, "NAME:"+nom);
+		// envoi "NAME:nom" au serveur
+		envoyerMessage(printer, "NAME:" + nom);
 	}
 
 	/**
@@ -155,6 +155,17 @@ public class ClientTCP {
 				socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static synchronized void recevoirTout(BufferedReader in) {
+		String msg = "";
+		try {
+			while ((msg = recevoirMessage(in)) != null) {
+				System.out.println(msg);
+			}
+		} catch (IOException e) {
+			System.exit(0);// TODO Dégeulasse? je compte le corriger. !au cazou
 		}
 	}
 }

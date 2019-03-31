@@ -64,7 +64,7 @@ public class ServeurTCP {
 		    	while((msg = recevoirMessage(reader)) != null) {
 		    		System.out.println("Msg received: " + msg);
 		    		//Envoyer message au client via envoyerMessage
-		    		envoyerMessage(printer, name + ">" + msg);
+		    		envoyerMessage(printer,name+"> "+ msg);
 		    	}
 	    	}
     	}
@@ -123,10 +123,22 @@ public class ServeurTCP {
 	*/
 	
 	public static String avoirNom(BufferedReader reader) throws IOException {
-		return recevoirMessage(reader);
-		// retourne le nom du client (en utilisant split de la classe String par
-		// exemple)
-	}
+        //retourne le nom du client (en utilisant split de la classe String par exemple)
+    	String[] parts = reader.readLine().split(":");
+    	if(parts.length == 2) {
+    		if(parts[0].equals("NAME")) {
+        		return parts[1];
+        	}
+        	else {
+        		System.out.println("Errparts");
+        		return null;
+        	}
+    	}
+    	else {
+    		System.out.println("errSplit");
+    		return null;
+    	}
+    }
 
 	public static BufferedReader creerReader(Charset charset, Socket socketVersUnClient) throws IOException {
 		// créé un BufferedReader associé à la Socket
