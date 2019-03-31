@@ -41,7 +41,7 @@ public class ClientTCP {
 		
 		try {
 			while (!checkip(ip)) {
-				System.out.println(" IP du serveur ?");
+				System.out.println("IP du serveur ?");
 				ip = lireMessageAuClavier();
 				// verif format
 			}
@@ -159,7 +159,7 @@ public class ClientTCP {
 		if (socket != null)
 			socket.close();
 	}
-
+/*
 	public static synchronized void recevoirTout(BufferedReader in) {
 		String msg = "";
 		try {
@@ -170,7 +170,7 @@ public class ClientTCP {
 			e.printStackTrace();
 		}
 	}
-	
+	*/
 	private static class ReceiveRunnable implements Runnable {
 		private boolean recvOn;
 		

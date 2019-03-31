@@ -79,7 +79,7 @@ public class ServeurTCP {
 				System.out.println("New client: " + name);
 				// Tant qu’il y’a un message à lire via recevoirMessage
 				ajouterPrinterSocketActives(printer);
-				envoyerATouteLesSocketsActive("Bienvenue � " + name);
+				envoyerATouteLesSocketsActive("Bienvenue a " + name);
 				while ((msg = recevoirMessage(reader)) != null && (!msg.equalsIgnoreCase(outMsg))) {
 					System.out.println("from: " + name + " > Msg received: " + msg);
 					if (!msg.equalsIgnoreCase(outMsg))
@@ -88,7 +88,7 @@ public class ServeurTCP {
 				}
 			}
 		} catch (IOException e) {
-			System.out.println("Client closed by mistake");
+			System.out.println("Client closed");
 			e.printStackTrace();
 		} finally {
 			socketVersUnClient.close();
