@@ -10,4 +10,5 @@ Elle se compose de 3 fichiers :
 - ClientTCP.java : Envoie des messages au serveur
 
 La seconde application est dans le package istic.pr.socket.udp.chat
+
 Elle est composé que d'un seul fichier (ChatMulticast.java) permettant l'envoi et la réception des messages.
