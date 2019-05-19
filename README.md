@@ -1,7 +1,7 @@
 # l3-chatjava
 Application java permettant un chat sur un un même réseau.
 
-Les packages découpent 2 applications différentes.
+Les packages se découpent en 2 applications différentes.
 
 La première application est dans le package istic.pr.socket.tcp.thread.
 Elle se compose de 3 fichiers :
